@@ -42,3 +42,4 @@ META-INF/
 .idea/
 /src/test/java/*.java
 /Windows Desktop.ini Editor Logs/
+out/

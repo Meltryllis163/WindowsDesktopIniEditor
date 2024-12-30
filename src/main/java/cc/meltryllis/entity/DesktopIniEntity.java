@@ -1,93 +1,130 @@
 package cc.meltryllis.entity;
 
 import cc.meltryllis.constants.DesktopIniConstants;
-import lombok.Setter;
+import com.formdev.flatlaf.util.StringUtils;
 import lombok.ToString;
 import org.ini4j.Ini;
 
-@Setter
+/**
+ * @author Zachary W
+ * @date 2024/12/30
+ */
 @ToString
 public class DesktopIniEntity {
 
-    /** 所在文件夹路径 */
-    private String folderPathString;
+    private final String DEFAULT_ICON_INDEX = "0";
+
     /** 别名 */
-    private String localizedResourceName;
+    private final String localizedResourceName;
     /** 备注 */
-    private String infoTip;
+    private final String infoTip;
+    /** 图标资源文件路径 */
+    private String iconResourceFile;
+    /** 图标资源文件索引 */
+    private String iconResourceIndex;
     /** 图标文件路径 */
     private String iconFile;
     /** 图标文件索引 */
-    private Integer iconIndex;
-    /** 文件原本的System属性 */
-    private Boolean isFolderSystem;
+    private String iconIndex;
 
     private DesktopIniEntity(Builder builder) {
-        setInfoTip(builder.tip);
+        this.infoTip = builder.infoTip;
+        this.localizedResourceName = builder.localizedResourceName;
         setIcon(builder.iconFile, builder.iconIndex);
-        setLocalizedResourceName(builder.localizedResourceName);
-        setIsFolderSystem(builder.isFolderSystem);
+        setIconResource(builder.iconResourceFile, builder.iconResourceIndex);
     }
 
-    public void setIcon(String iconFile) {
-        setIcon(iconFile, 0);
+    private void setIcon(String iconFile) {
+        setIcon(iconFile, DEFAULT_ICON_INDEX);
     }
 
-    public void setIcon(String iconFile, int iconIndex) {
-        setIconFile(iconFile);
-        setIconIndex(iconIndex);
+    private void setIcon(String iconFile, String iconIndex) {
+        this.iconFile = iconFile;
+        this.iconIndex = iconIndex;
+    }
+
+    private void setIconResource(String iconResourceFile, String iconResourceIndex) {
+        this.iconResourceFile = iconResourceFile;
+        this.iconResourceIndex = iconResourceIndex;
+    }
+
+    private String getIconResource() {
+        String iconResourceIndex = StringUtils.isEmpty(iconIndex) ? "" : ", " + this.iconResourceIndex;
+        return StringUtils.isEmpty(iconResourceFile) ? null : iconResourceFile + iconResourceIndex;
+    }
+
+    private void setIconResource(String iconResourceFile) {
+        setIconResource(iconResourceFile, null);
     }
 
     public Ini convertToIni() {
         Ini iniFile = new Ini();
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_LOCALIZED_RESOURCE_NAME, localizedResourceName);
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_INFO_TIP, infoTip);
+        iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_ICON_RESOURCE,
+                getIconResource());
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_ICON_FILE, iconFile);
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_ICON_INDEX, iconIndex);
-        iniFile.add(DesktopIniConstants.SECTION_ORIGINAL_FOLDER_ATTRIBUTE, DesktopIniConstants.KEY_IS_SYSTEM, isFolderSystem);
         return iniFile;
     }
 
     public static class Builder {
 
         private String localizedResourceName;
-        private String tip;
+        private String infoTip;
+        private String iconResourceFile;
+        private String iconResourceIndex;
         private String iconFile;
-        private int iconIndex;
-        private boolean isFolderSystem;
+        private String iconIndex;
 
         public static Builder builder() {
             return new Builder();
         }
 
+        private static String emptyToNull(String str) {
+            if (str == null) {
+                return null;
+            }
+            if (str.isEmpty() || str.trim().isEmpty()) {
+                return null;
+            }
+            return str;
+        }
+
         public Builder localizedResourceName(String name) {
-            this.localizedResourceName = name;
+            this.localizedResourceName = emptyToNull(name);
             return this;
         }
 
-        public Builder infoTip(String tip) {
-            this.tip = tip;
+        public Builder infoTip(String infoTip) {
+            this.infoTip = emptyToNull(infoTip);
+            return this;
+        }
+
+        public Builder iconResource(String iconResourceFile) {
+            iconResource(iconResourceFile, iconResourceIndex);
             return this;
         }
 
         public Builder icon(String iconFile) {
-            return icon(iconFile, 0);
+            return icon(iconFile, null);
         }
 
-        public Builder icon(String iconFile, int iconIndex) {
-            this.iconFile = iconFile;
-            this.iconIndex = iconIndex;
-            return this;
-        }
-
-        public Builder folderSystem(boolean isSystem) {
-            this.isFolderSystem = isSystem;
+        public Builder iconResource(String iconResourceFile, String iconResourceIndex) {
+            this.iconResourceFile = emptyToNull(iconResourceFile);
+            this.iconResourceIndex = StringUtils.isEmpty(this.iconResourceFile) ? null : iconResourceIndex;
             return this;
         }
 
         // TODO null检测
         public DesktopIniEntity build() {
             return new DesktopIniEntity(this);
+        }
+
+        public Builder icon(String iconFile, String iconIndex) {
+            this.iconFile = emptyToNull(iconFile);
+            this.iconIndex = StringUtils.isEmpty(this.iconFile) ? null : iconIndex;
+            return this;
         }
 
     }

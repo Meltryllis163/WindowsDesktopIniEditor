@@ -8,8 +8,9 @@ import java.awt.*;
  */
 public interface UIConstants {
 
-    int MIN_WIDTH = 350;
+    int MIN_WIDTH = 500;
     int MIN_HEIGHT = 0;
     Dimension MINIMUM_SIZE = new Dimension(MIN_WIDTH, MIN_HEIGHT);
+    int ICON_TEXT_GAP = 10;
 
 }

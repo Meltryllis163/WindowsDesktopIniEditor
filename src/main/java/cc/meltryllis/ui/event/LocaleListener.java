@@ -1,4 +1,4 @@
-package cc.meltryllis.ui.components;
+package cc.meltryllis.ui.event;
 
 import java.util.EventListener;
 import java.util.Locale;

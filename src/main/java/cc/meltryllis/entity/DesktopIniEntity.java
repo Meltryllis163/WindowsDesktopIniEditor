@@ -5,6 +5,10 @@ import lombok.Setter;
 import lombok.ToString;
 import org.ini4j.Ini;
 
+/**
+ * @author Zachary W
+ * @date 2024/12/30
+ */
 @Setter
 @ToString
 public class DesktopIniEntity {
@@ -53,7 +57,7 @@ public class DesktopIniEntity {
         private String localizedResourceName;
         private String tip;
         private String iconFile;
-        private int iconIndex;
+        private Integer iconIndex;
         private boolean isFolderSystem;
 
         public static Builder builder() {
@@ -71,10 +75,10 @@ public class DesktopIniEntity {
         }
 
         public Builder icon(String iconFile) {
-            return icon(iconFile, 0);
+            return icon(iconFile, null);
         }
 
-        public Builder icon(String iconFile, int iconIndex) {
+        public Builder icon(String iconFile, Integer iconIndex) {
             this.iconFile = iconFile;
             this.iconIndex = iconIndex;
             return this;

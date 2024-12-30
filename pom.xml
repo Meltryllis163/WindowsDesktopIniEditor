@@ -14,6 +14,35 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.github.janix520</groupId>
+                <artifactId>maven-easypackage-plugin</artifactId>
+                <version>1.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jpackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <minimum>true</minimum>
+                    <name>${project.artifactId}</name>
+                    <mainClass>cc.meltryllis.ui.MainApplication</mainClass>
+                    <winConsole>false</winConsole>
+                    <icon>${project.basedir}\src\main\resources\icons\icon.ico</icon>
+                    <type>app-image</type>
+                    <appVersion>1.0.0</appVersion>
+                    <description>A java program for editing Windows desktop.ini file.</description>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+    
     <dependencies>
         <!-- https://mvnrepository.com/artifact/org.ini4j/ini4j -->
         <dependency>
@@ -73,5 +102,4 @@
             <version>3.5.4</version>
         </dependency>
     </dependencies>
-
 </project>

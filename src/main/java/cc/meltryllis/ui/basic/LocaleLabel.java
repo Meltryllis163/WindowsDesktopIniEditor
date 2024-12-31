@@ -1,7 +1,7 @@
-package cc.meltryllis.ui.components;
+package cc.meltryllis.ui.basic;
 
 import cc.meltryllis.constants.I18nConstants;
-import com.formdev.flatlaf.extras.FlatSVGIcon;
+import cc.meltryllis.ui.event.LocaleListener;
 
 import javax.swing.*;
 import java.util.Locale;
@@ -19,7 +19,10 @@ public class LocaleLabel extends JLabel implements LocaleListener {
 
     public LocaleLabel(String localeTextKey) {
         this(localeTextKey, null, LEADING);
+    }
 
+    public LocaleLabel(String localeTextKey, Icon icon) {
+        this(localeTextKey, icon, LEADING);
     }
 
     public LocaleLabel(String key, Icon icon, int horizontalAlignment) {
@@ -39,10 +42,6 @@ public class LocaleLabel extends JLabel implements LocaleListener {
     public void localeChanged(Locale locale) {
         ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
         setText(bundle.getString(localeTextKey));
-    }
-
-    public static LocaleLabel createDebugLabel() {
-        return new LocaleLabel("ui.undefinedText", new FlatSVGIcon("icons/error.svg"), JLabel.CENTER);
     }
 
 }

@@ -1,6 +1,7 @@
 package cc.meltryllis.entity;
 
 import cc.meltryllis.constants.DesktopIniConstants;
+import com.formdev.flatlaf.util.StringUtils;
 import lombok.Setter;
 import lombok.ToString;
 import org.ini4j.Ini;
@@ -23,21 +24,18 @@ public class DesktopIniEntity {
     private String iconFile;
     /** 图标文件索引 */
     private Integer iconIndex;
-    /** 文件原本的System属性 */
-    private Boolean isFolderSystem;
 
     private DesktopIniEntity(Builder builder) {
         setInfoTip(builder.tip);
         setIcon(builder.iconFile, builder.iconIndex);
         setLocalizedResourceName(builder.localizedResourceName);
-        setIsFolderSystem(builder.isFolderSystem);
     }
 
     public void setIcon(String iconFile) {
         setIcon(iconFile, 0);
     }
 
-    public void setIcon(String iconFile, int iconIndex) {
+    public void setIcon(String iconFile, Integer iconIndex) {
         setIconFile(iconFile);
         setIconIndex(iconIndex);
     }
@@ -48,7 +46,6 @@ public class DesktopIniEntity {
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_INFO_TIP, infoTip);
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_ICON_FILE, iconFile);
         iniFile.add(DesktopIniConstants.SECTION_SHELL_CLASS_INFO, DesktopIniConstants.KEY_ICON_INDEX, iconIndex);
-        iniFile.add(DesktopIniConstants.SECTION_ORIGINAL_FOLDER_ATTRIBUTE, DesktopIniConstants.KEY_IS_SYSTEM, isFolderSystem);
         return iniFile;
     }
 
@@ -58,7 +55,6 @@ public class DesktopIniEntity {
         private String tip;
         private String iconFile;
         private Integer iconIndex;
-        private boolean isFolderSystem;
 
         public static Builder builder() {
             return new Builder();
@@ -80,12 +76,7 @@ public class DesktopIniEntity {
 
         public Builder icon(String iconFile, Integer iconIndex) {
             this.iconFile = iconFile;
-            this.iconIndex = iconIndex;
-            return this;
-        }
-
-        public Builder folderSystem(boolean isSystem) {
-            this.isFolderSystem = isSystem;
+            this.iconIndex = StringUtils.isEmpty(iconFile) ? null : iconIndex;
             return this;
         }
 

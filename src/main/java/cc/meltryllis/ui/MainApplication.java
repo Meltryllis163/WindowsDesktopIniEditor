@@ -1,7 +1,7 @@
 package cc.meltryllis.ui;
 
 import cc.meltryllis.constants.UIConstants;
-import cc.meltryllis.ui.components.LocaleListener;
+import cc.meltryllis.ui.event.CustomEventManager;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatInspector;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
@@ -12,9 +12,6 @@ import org.ini4j.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Zachary W
@@ -24,12 +21,6 @@ import java.util.Locale;
 public class MainApplication extends JFrame {
 
     public static MainApplication app;
-
-    private final List<LocaleListener> localListeners;
-
-    public MainApplication() {
-        localListeners = new ArrayList<>();
-    }
 
     public void initApplication() {
         setIconImages(FlatSVGUtils.createWindowIconImages("/icons/main.svg"));
@@ -55,30 +46,14 @@ public class MainApplication extends JFrame {
 
     public void initMenuBar() {
         LocaleMenuBar menuBar = new LocaleMenuBar();
-        addLocaleListener(menuBar);
+        CustomEventManager.getInstance().addLocaleListener(menuBar);
         setJMenuBar(menuBar);
     }
 
     public void initEditorPanel() {
         EditorPanel editorPanel = new EditorPanel();
-        addLocaleListener(editorPanel);
+        CustomEventManager.getInstance().addLocaleListener(editorPanel);
         add(editorPanel, BorderLayout.CENTER);
-    }
-
-    private void addLocaleListener(LocaleListener l) {
-        if (!localListeners.contains(l)) {
-            localListeners.add(l);
-        }
-    }
-
-    private void removeLocaleListener(LocaleListener l) {
-        localListeners.remove(l);
-    }
-
-    public void fireLocaleChanged(Locale locale) {
-        for (LocaleListener localListener : localListeners) {
-            localListener.localeChanged(locale);
-        }
     }
 
     public static void main(String[] args) {

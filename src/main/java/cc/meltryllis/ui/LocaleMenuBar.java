@@ -1,12 +1,12 @@
 package cc.meltryllis.ui;
 
 import cc.meltryllis.constants.I18nConstants;
-import cc.meltryllis.ui.components.LocaleListener;
+import cc.meltryllis.ui.event.CustomEventManager;
+import cc.meltryllis.ui.event.LocaleListener;
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.extras.components.FlatButton;
-import com.github.weisj.jsvg.parser.SwingUIFuture;
 
 import javax.swing.*;
 import java.util.Arrays;
@@ -48,7 +48,7 @@ public class LocaleMenuBar extends JMenuBar implements LocaleListener {
             item.addActionListener(e -> {
                 Locale.setDefault(locale);
                 ResourceBundle.clearCache();
-                MainApplication.app.fireLocaleChanged(locale);
+                CustomEventManager.getInstance().fireLocaleChanged(locale);
             });
             languageMenu.add(item);
         }

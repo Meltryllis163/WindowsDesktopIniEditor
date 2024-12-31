@@ -59,6 +59,16 @@ public class LocaleMenuBar extends JMenuBar implements LocaleListener {
 
         helpMenu = new JMenu(bundle.getString("ui.menu.help"));
         aboutItem = new JMenuItem(bundle.getString("ui.menu.help.about"));
+        aboutItem.addActionListener(e -> {
+            JDialog aboutDialog = new JDialog(MainApplication.app);
+            aboutDialog.setResizable(false);
+            aboutDialog.setTitle(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
+                    .getString("ui.about.title"));
+            aboutDialog.setContentPane(new AboutPanel());
+            aboutDialog.pack();
+            aboutDialog.setLocationRelativeTo(MainApplication.app);
+            aboutDialog.setVisible(true);
+        });
         helpMenu.add(aboutItem);
         add(helpMenu);
 

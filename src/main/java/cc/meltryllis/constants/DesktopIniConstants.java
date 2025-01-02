@@ -17,6 +17,8 @@ public interface DesktopIniConstants {
 
     String KEY_INFO_TIP = "InfoTip";
 
+    String KEY_ICON_RESOURCE = "IconResource";
+
     String KEY_ICON_FILE = "IconFile";
 
     String KEY_ICON_INDEX = "IconIndex";

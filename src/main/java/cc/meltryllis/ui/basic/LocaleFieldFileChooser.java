@@ -26,7 +26,7 @@ import java.util.Locale;
  * @date 2024/12/25
  */
 @Log4j2
-public class LocaleFileChooserField extends JPanel implements LocaleListener {
+public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
 
     public static final int EMPTY = 0;
     public static final int INVALID = 1;
@@ -41,11 +41,11 @@ public class LocaleFileChooserField extends JPanel implements LocaleListener {
     @Getter
     private int validateResult;
 
-    public LocaleFileChooserField(@NonNull LocaleFileChooser fileChooser, String fileRuleI18nKey) {
+    public LocaleFieldFileChooser(@NonNull LocaleFileChooser fileChooser, String fileRuleI18nKey) {
         this(fileChooser, 600, fileRuleI18nKey);
     }
 
-    public LocaleFileChooserField(@NonNull LocaleFileChooser fileChooser, int timerDelay, String fileRuleI18nKey) {
+    public LocaleFieldFileChooser(@NonNull LocaleFileChooser fileChooser, int timerDelay, String fileRuleI18nKey) {
         MigLayout layout = new MigLayout("ins 0, left top");
         this.fileChooser = fileChooser;
         setLayout(layout);

@@ -1,0 +1,124 @@
+package cc.meltryllis.ui.basic;
+
+import cc.meltryllis.constants.I18nConstants;
+import lombok.NonNull;
+
+import javax.swing.*;
+import java.awt.*;
+import java.util.ResourceBundle;
+
+/**
+ * 提供Builder模式给各种弹出面板。
+ *
+ * @author Zachary W
+ * @date 2025/1/3
+ */
+public final class DialogBuilder {
+
+    private DialogBuilder() {
+        throw new RuntimeException();
+    }
+
+    public static class MessageDialogBuilder {
+
+        private final Object message;
+        private Component parentComponent;
+        private String title;
+        private int messageType;
+        private Icon icon;
+
+        private MessageDialogBuilder(@NonNull String messageI18nKey) {
+            ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+            this.message = bundle.getObject(messageI18nKey);
+            this.title = UIManager.getString("OptionPane.messageDialogTitle");
+            this.messageType = JOptionPane.INFORMATION_MESSAGE;
+        }
+
+        public MessageDialogBuilder builder(@NonNull String messageI18nKey) {
+            return new MessageDialogBuilder(messageI18nKey);
+        }
+
+        public MessageDialogBuilder parentComponent(Component c) {
+            this.parentComponent = c;
+            return this;
+        }
+
+        public MessageDialogBuilder titleI18nKey(String titleI18nKey) {
+            ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+            this.title = bundle.getString(titleI18nKey);
+            return this;
+        }
+
+        public MessageDialogBuilder messageType(int type) {
+            this.messageType = type;
+            return this;
+        }
+
+        public MessageDialogBuilder icon(Icon icon) {
+            this.icon = icon;
+            return this;
+        }
+
+        public void show() {
+            JOptionPane.showMessageDialog(parentComponent, message, title, messageType, icon);
+        }
+
+    }
+
+    public static class JDialogBuilder {
+
+        private Frame owner;
+        private String title;
+        private boolean modal;
+        private Container contentPane;
+        private boolean resizable;
+
+        public JDialogBuilder() {
+            this.owner = null;
+            this.title = "";
+            this.modal = false;
+            this.contentPane = null;
+            this.resizable = true;
+        }
+
+        public static JDialogBuilder builder() {
+            return new JDialogBuilder();
+        }
+
+        public JDialogBuilder owner(Frame owner) {
+            this.owner = owner;
+            return this;
+        }
+
+        public JDialogBuilder titleI18nKey(String titleI18nKey) {
+            this.title = ResourceBundle.getBundle(I18nConstants.BASE_NAME).getString(titleI18nKey);
+            return this;
+        }
+
+        public JDialogBuilder modal(boolean modal) {
+            this.modal = modal;
+            return this;
+        }
+
+        public JDialogBuilder contentPane(Container contentPane) {
+            this.contentPane = contentPane;
+            return this;
+        }
+
+        public JDialogBuilder resizable(boolean resizable) {
+            this.resizable = resizable;
+            return this;
+        }
+
+        public void show() {
+            JDialog dialog = new JDialog(owner, title, modal);
+            dialog.setContentPane(contentPane);
+            dialog.pack();
+            dialog.setLocationRelativeTo(owner);
+            dialog.setResizable(resizable);
+            dialog.setVisible(true);
+        }
+
+    }
+
+}

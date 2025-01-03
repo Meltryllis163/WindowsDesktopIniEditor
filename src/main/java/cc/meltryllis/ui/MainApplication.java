@@ -1,6 +1,7 @@
 package cc.meltryllis.ui;
 
 import cc.meltryllis.constants.UIConstants;
+import cc.meltryllis.ui.basic.DialogBuilder;
 import cc.meltryllis.ui.event.CustomEventManager;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatInspector;
@@ -94,7 +95,9 @@ public class MainApplication extends JFrame {
                     magicCount = 0;
             }
             if (magicCount == 4) {
-                System.out.println("Meltryllis Forever");
+                DialogBuilder.JDialogBuilder.builder().owner(this).modal(true)
+                        .titleI18nKey("ui.dialog.meltryllis.title").contentPane(new MeltryllisPanel()).resizable(false)
+                        .show();
                 magicCount = 0;
                 return true;
             }

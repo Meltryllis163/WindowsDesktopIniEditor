@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
  * @author Zachary W
  * @date 2025/1/3
  */
+@SuppressWarnings("unused, MagicConstant")
 public final class DialogBuilder {
 
     private DialogBuilder() {
@@ -62,6 +63,69 @@ public final class DialogBuilder {
         public void show() {
             JOptionPane.showMessageDialog(parentComponent, message, title, messageType, icon);
         }
+
+    }
+
+    public static class OptionDialogBuilder {
+
+        private final Object message;
+        private Component parentComponent;
+        private String title;
+        private int optionType;
+        private int messageType;
+        private Icon icon;
+        private Object[] options;
+        private Object initialValue;
+
+        private OptionDialogBuilder(Object message) {
+            this.optionType = JOptionPane.DEFAULT_OPTION;
+            this.messageType = JOptionPane.PLAIN_MESSAGE;
+            this.message = message;
+        }
+
+        public static OptionDialogBuilder builder(Object message) {
+            return new OptionDialogBuilder(message);
+        }
+
+        public OptionDialogBuilder parent(Component parentComponent) {
+            this.parentComponent = parentComponent;
+            return this;
+        }
+
+        public OptionDialogBuilder title(String title) {
+            this.title = title;
+            return this;
+        }
+
+        public OptionDialogBuilder optionType(int type) {
+            this.optionType = type;
+            return this;
+        }
+
+        public OptionDialogBuilder messageType(int type) {
+            this.messageType = type;
+            return this;
+        }
+
+        public OptionDialogBuilder icon(Icon icon) {
+            this.icon = icon;
+            return this;
+        }
+
+        public OptionDialogBuilder options(Object[] options) {
+            this.options = options;
+            return this;
+        }
+
+        public OptionDialogBuilder initialValue(Object initialValue) {
+            this.initialValue = initialValue;
+            return this;
+        }
+
+        public int show() {
+            return JOptionPane.showOptionDialog(parentComponent, message, title, optionType, messageType, icon, options, initialValue);
+        }
+
 
     }
 

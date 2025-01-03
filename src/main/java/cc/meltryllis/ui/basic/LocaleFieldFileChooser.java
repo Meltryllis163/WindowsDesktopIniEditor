@@ -170,7 +170,7 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
             }
             boolean isValid = validateResult == VALID;
             validateResultTip.setIcon(new FlatSVGIcon(isValid ? "icons/pass.svg" : "icons/error.svg"));
-            validateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.validPath" : fileRuleI18nKey);
+            validateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.common.valid.tip" : fileRuleI18nKey);
         }
         revalidate();
     }

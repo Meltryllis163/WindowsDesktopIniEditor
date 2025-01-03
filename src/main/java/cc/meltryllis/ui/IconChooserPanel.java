@@ -1,9 +1,11 @@
 package cc.meltryllis.ui;
 
+import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.ui.basic.IconFileFilter;
 import cc.meltryllis.ui.basic.LocaleFieldFileChooser;
 import cc.meltryllis.ui.basic.LocaleFileChooser;
 import cc.meltryllis.ui.basic.LocaleLabel;
+import cc.meltryllis.ui.event.LocaleListener;
 import com.formdev.flatlaf.util.StringUtils;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
@@ -11,6 +13,8 @@ import net.miginfocom.swing.MigLayout;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * 含有图标和图标索引输入框的面板。
@@ -18,7 +22,7 @@ import javax.swing.event.DocumentListener;
  * @author Zachary W
  * @date 2025/1/3
  */
-public class IconChooserPanel extends JPanel implements DocumentListener {
+public class IconChooserPanel extends JPanel implements DocumentListener, LocaleListener {
 
     public static final String DEFAULT_INDEX = "0";
 
@@ -41,12 +45,14 @@ public class IconChooserPanel extends JPanel implements DocumentListener {
         row++;
         LocaleFileChooser iconChooser = LocaleFileChooser.Builder.builder().fileSelectionMode(JFileChooser.FILES_ONLY)
                 .addChoosableFileFilter(new IconFileFilter()).build();
-        fieldIconFile = new LocaleFieldFileChooser(iconChooser, "ui.fileChooser.icon");
+        fieldIconFile = new LocaleFieldFileChooser(iconChooser, "ui.fileChooser.icon.tip");
         fieldIconFile.addDocumentListener(this);
         add(fieldIconFile, new CC().cell(column, row));
 
         fieldIconIndex = new JTextField(DEFAULT_INDEX);
         fieldIconIndex.setEnabled(false);
+        fieldIconIndex.setToolTipText(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
+                .getString("ui.field.iconIndex.tooltip"));
         add(fieldIconIndex, new CC().cell(column + 1, row));
     }
 
@@ -108,6 +114,12 @@ public class IconChooserPanel extends JPanel implements DocumentListener {
     @Override
     public void changedUpdate(DocumentEvent e) {
 
+    }
+
+    @Override
+    public void localeChanged(Locale locale) {
+        fieldIconIndex.setToolTipText(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
+                .getString("ui.field.iconIndex.tooltip"));
     }
 
 }

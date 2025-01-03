@@ -39,16 +39,16 @@ public class AboutPanel extends JPanel implements LocaleListener {
     public void initComponents() {
         int row = 0;
         int column = 0;
-        versionKey = new LocaleLabel("ui.about.version", new FlatSVGIcon("icons/version.svg"));
+        versionKey = new LocaleLabel("ui.aboutPane.version", new FlatSVGIcon("icons/version.svg"));
         versionKey.setIconTextGap(UIConstants.ICON_TEXT_GAP);
         add(versionKey, new CC().cell(column, row));
         add(new JLabel(VERSION), new CC().cell(column + 1, row));
 
         row++;
-        githubKey = new LocaleLabel("ui.about.github", new FlatSVGIcon("icons/github.svg"));
+        githubKey = new LocaleLabel("ui.aboutPane.github", new FlatSVGIcon("icons/github.svg"));
         githubKey.setIconTextGap(UIConstants.ICON_TEXT_GAP);
         add(githubKey, new CC().cell(column, row));
-        githubValue = new LocaleLabel("ui.about.clickHere");
+        githubValue = new LocaleLabel("ui.aboutPane.clickHere");
         githubValue.setToolTipText(GITHUB_SITE);
         githubValue.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         githubValue.addMouseListener(new MouseAdapter() {

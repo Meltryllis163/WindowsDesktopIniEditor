@@ -31,7 +31,7 @@ public class IconFileFilter extends FileFilter {
     @Override
     public String getDescription() {
         ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-        return bundle.getString("ui.fileChooser.iconFile");
+        return bundle.getString("ui.fileChooser.iconFile.description");
     }
 
 }

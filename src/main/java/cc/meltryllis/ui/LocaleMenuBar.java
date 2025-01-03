@@ -63,7 +63,7 @@ public class LocaleMenuBar extends JMenuBar implements LocaleListener {
             JDialog aboutDialog = new JDialog(MainApplication.app);
             aboutDialog.setResizable(false);
             aboutDialog.setTitle(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
-                    .getString("ui.about.title"));
+                    .getString("ui.aboutPane.title"));
             aboutDialog.setContentPane(new AboutPanel());
             aboutDialog.pack();
             aboutDialog.setLocationRelativeTo(MainApplication.app);

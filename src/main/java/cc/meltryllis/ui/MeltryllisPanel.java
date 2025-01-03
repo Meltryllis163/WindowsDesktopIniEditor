@@ -35,7 +35,7 @@ public class MeltryllisPanel extends JPanel {
         textArea.setEnabled(false);
         add(textArea, new CC().cell(1, 0).alignY("top"));
 
-        JTextArea textAreaArt = new JTextArea(bundle.getString("ui.dialog.meltryllis.art"));
+        JTextArea textAreaArt = new JTextArea(bundle.getString("ui.dialog.meltryllis.artInfo"));
         textAreaArt.setEnabled(false);
         add(textAreaArt, new CC().cell(1, 1).alignY("bottom"));
     }

@@ -68,19 +68,19 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelFolderPath, new CC().cell(column, row).spanX(2));
         row++;
         LocaleFileChooser folderChooser = LocaleFileChooser.Builder.builder()
-                .fileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-                .addChoosableFileFilter(new FolderFileFilter())
-                .approveButtonTextKey("ui.button.ok")
-                .build();
+                .fileSelectionMode(JFileChooser.DIRECTORIES_ONLY).addChoosableFileFilter(new FolderFileFilter())
+                .approveButtonTextKey("ui.button.ok").build();
         fieldFolderPath = new LocaleFileChooserField(folderChooser, "ui.fileChooser.folder");
         fieldFolderPath.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
+                log.info("Folder text changed. Fire FolderChanged event.");
                 CustomEventManager.getInstance().fireFolderChanged();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
+                log.info("Folder text changed. Fire FolderChanged event.");
                 CustomEventManager.getInstance().fireFolderChanged();
             }
 
@@ -112,10 +112,52 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelIconResourceIndex, new CC().cell(column + 1, row));
         row++;
         LocaleFileChooser iconResourceChooser = LocaleFileChooser.Builder.builder()
-                .fileSelectionMode(JFileChooser.FILES_ONLY)
-                .addChoosableFileFilter(new IconFileFilter())
-                .build();
+                .fileSelectionMode(JFileChooser.FILES_ONLY).addChoosableFileFilter(new IconFileFilter()).build();
         fieldIconResourceFile = new LocaleFileChooserField(iconResourceChooser, "ui.fileChooser.icon");
+        fieldIconResourceFile.addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = fieldIconResourceFile.getText();
+                if (!StringUtils.isEmpty(text)) {
+                    int index = text.lastIndexOf('.');
+                    if (index >= 0) {
+                        String extension = text.substring(index);
+                        if (".dll".equalsIgnoreCase(extension)) {
+                            fieldIconResourceIndex.setEnabled(true);
+                            return;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    fieldIconResourceIndex.setText("0");
+                    fieldIconResourceIndex.setEnabled(false);
+                });
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = fieldIconResourceFile.getText();
+                if (!StringUtils.isEmpty(text)) {
+                    int index = text.lastIndexOf('.');
+                    if (index >= 0) {
+                        String extension = text.substring(index);
+                        if (".dll".equalsIgnoreCase(extension)) {
+                            SwingUtilities.invokeLater(() -> fieldIconResourceIndex.setEnabled(true));
+                            return;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    fieldIconResourceIndex.setText("0");
+                    fieldIconResourceIndex.setEnabled(false);
+                });
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
         add(fieldIconResourceFile, new CC().cell(column, row));
         fieldIconResourceIndex = new JTextField("0");
         fieldIconResourceIndex.setEnabled(false);
@@ -128,11 +170,54 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelIconIndex, new CC().cell(column + 1, row));
 
         row++;
-        LocaleFileChooser iconChooser = LocaleFileChooser.Builder.builder()
-                .fileSelectionMode(JFileChooser.FILES_ONLY)
-                .addChoosableFileFilter("图标文件 (*.ico; *.bmp; *.exe; *.dll)", "ico", "bmp", "exe", "dll")
-                .build();
+        LocaleFileChooser iconChooser = LocaleFileChooser.Builder.builder().fileSelectionMode(JFileChooser.FILES_ONLY)
+                .addChoosableFileFilter("图标文件 (*.ico; *.bmp; *.exe; *.dll)", "ico", "bmp", "exe", "dll").build();
         fieldIconFile = new LocaleFileChooserField(iconChooser, "ui.fileChooser.icon");
+        fieldIconFile.addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                String text = fieldIconFile.getText();
+                if (!StringUtils.isEmpty(text)) {
+                    int index = text.lastIndexOf('.');
+                    if (index >= 0) {
+                        String extension = text.substring(index);
+                        if (".dll".equalsIgnoreCase(extension)) {
+                            SwingUtilities.invokeLater(() -> fieldIconIndex.setEnabled(true));
+                            return;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    fieldIconIndex.setEnabled(false);
+                    fieldIconIndex.setText("0");
+                });
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                String text = fieldIconFile.getText();
+                if (!StringUtils.isEmpty(text)) {
+                    int index = text.lastIndexOf('.');
+                    if (index >= 0) {
+                        String extension = text.substring(index);
+                        if (".dll".equalsIgnoreCase(extension)) {
+                            SwingUtilities.invokeLater(() -> fieldIconIndex.setEnabled(true));
+                            return;
+                        }
+                    }
+                }
+                SwingUtilities.invokeLater(() -> {
+                    fieldIconIndex.setEnabled(false);
+                    fieldIconIndex.setText("0");
+                });
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+
         add(fieldIconFile, new CC().cell(column, row));
         fieldIconIndex = new JTextField("0");
         fieldIconIndex.setEnabled(false);
@@ -177,11 +262,6 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
     }
 
     public void loadDesktopIniContent() {
-        fieldInfoTip.setText(null);
-        fieldLocalizedResourceName.setText(null);
-        fieldIconResourceFile.setText(null);
-        fieldIconIndex.setEnabled(false);
-        fieldIconResourceIndex.setEnabled(false);
         try {
             if (processor == null) {
                 processor = new DesktopIniProcessor(fieldFolderPath.getText());
@@ -191,21 +271,18 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         } catch (NoSuchFileException e) {
             return;
         }
+        log.info("Start loading desktop.ini content, current path : {}", fieldFolderPath.getText());
         Ini desktopIni = processor.getDesktopIni();
         Profile.Section section =
                 desktopIni == null ? null : desktopIni.get(DesktopIniConstants.SECTION_SHELL_CLASS_INFO);
         if (section != null) {
             if (containDllSource(desktopIni)) {
                 ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-                Object[] options = new Object[]{
-                        bundle.getString("ui.dialog.dllWarning.option.continue"),
-                        bundle.getString("ui.dialog.dllWarning.option.cancel")
-                };
-                int res = JOptionPane.showOptionDialog(this, bundle.getString("ui.dialog.dllWarning.message"), bundle.getString("ui.dialog.dllWarning.title"), JOptionPane.YES_NO_OPTION,
-                        JOptionPane.WARNING_MESSAGE, null, options, JOptionPane.NO_OPTION);
-                if (res == JOptionPane.YES_OPTION) {
-                    fieldIconIndex.setEnabled(true);
-                } else {
+                Object[] options = new Object[]{bundle.getString("ui.dialog.dllWarning.option.continue"), bundle.getString("ui.dialog.dllWarning.option.cancel")};
+                int res = JOptionPane.showOptionDialog(this, bundle.getString("ui.dialog.dllWarning.message"), bundle.getString("ui.dialog.dllWarning.title"), JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE, null, options, JOptionPane.NO_OPTION);
+                log.info("DLL file detected. User choose {}.", res == JOptionPane.YES_OPTION ? "continue" : "cancel");
+                if (res != JOptionPane.YES_OPTION) {
+                    // TODO 这个地方会出现set以后立刻清除的一个闪烁
                     SwingUtilities.invokeLater(() -> fieldFolderPath.setText(null));
                     return;
                 }
@@ -222,6 +299,11 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
             }
             fieldIconFile.setText(section.get(DesktopIniConstants.KEY_ICON_FILE));
             fieldIconIndex.setText(section.get(DesktopIniConstants.KEY_ICON_INDEX));
+        } else {
+            log.info("No desktop.ini exist. Clear all text.");
+            fieldInfoTip.setText(null);
+            fieldLocalizedResourceName.setText(null);
+            fieldIconResourceFile.setText(null);
         }
     }
 
@@ -230,23 +312,18 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         if (section == null) {
             return false;
         }
-        return containDllSource(section.get(DesktopIniConstants.KEY_LOCALIZED_RESOURCE_NAME))
-                || containDllSource(section.get(DesktopIniConstants.KEY_INFO_TIP))
-                || containDllSource(section.get(DesktopIniConstants.KEY_ICON_FILE));
+        return containDllSource(section.get(DesktopIniConstants.KEY_LOCALIZED_RESOURCE_NAME)) || containDllSource(section.get(DesktopIniConstants.KEY_INFO_TIP)) || containDllSource(section.get(DesktopIniConstants.KEY_ICON_FILE));
     }
 
     private boolean containDllSource(String path) {
-        return !StringUtils.isEmpty(path) && path.startsWith("@") && path.toUpperCase()
-                .contains(".DLL");
+        return !StringUtils.isEmpty(path) && path.startsWith("@") && path.toUpperCase().contains(".DLL");
     }
 
     private DesktopIniEntity generateDesktopIniEntity() {
-        return DesktopIniEntity.Builder.builder()
-                .localizedResourceName(fieldLocalizedResourceName.getText())
+        return DesktopIniEntity.Builder.builder().localizedResourceName(fieldLocalizedResourceName.getText())
                 .infoTip(fieldInfoTip.getText())
                 .iconResource(fieldIconResourceFile.getText(), fieldIconResourceIndex.getText())
-                .icon(fieldIconFile.getText(), fieldIconIndex.getText())
-                .build();
+                .icon(fieldIconFile.getText(), fieldIconIndex.getText()).build();
     }
 
     @Override
@@ -262,7 +339,7 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
 
     @Override
     public void folderChanged() {
-        log.debug("folderChanged");
+        log.info("Folder Changed.");
         loadDesktopIniContent();
     }
 

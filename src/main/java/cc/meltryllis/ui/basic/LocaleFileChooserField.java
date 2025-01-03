@@ -93,19 +93,20 @@ public class LocaleFileChooserField extends JPanel implements LocaleListener {
 
             @Override
             public void focusLost(FocusEvent e) {
+                log.info("Focus Lost. validatePath()");
                 validatePath();
             }
         });
         fileField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                log.debug("insertUpdate");
+                log.info("Text changed. Timer restart.");
                 validatePathTimer.restart();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                log.debug("removeUpdate");
+                log.info("Text changed. Timer restart.");
                 validatePathTimer.restart();
             }
 
@@ -128,7 +129,6 @@ public class LocaleFileChooserField extends JPanel implements LocaleListener {
     }
 
     private void validatePath() {
-        log.debug("validatePath()");
         String path = getText();
         if (StringUtils.isEmpty(path)) {
             this.validateResult = EMPTY;
@@ -141,6 +141,7 @@ public class LocaleFileChooserField extends JPanel implements LocaleListener {
                 this.validateResult = INVALID;
             }
         }
+        log.info("validatePath, result is {}", validateResult);
         updateFileChooserCurrentDirectory();
         updateValidateResultTip();
     }
@@ -176,14 +177,13 @@ public class LocaleFileChooserField extends JPanel implements LocaleListener {
 
     public void setText(String text) {
         String oldText = fileField.getText();
-        if (oldText == null) {
+        log.info("setText(), oldText is {}, newTest is {}.", oldText, text);
+        if (StringUtils.isEmpty(oldText)) {
             if (!StringUtils.isEmpty(text)) {
                 fileField.setText(text);
-                validatePath();
             }
         } else if (!oldText.equals(text)) {
             fileField.setText(text);
-            validatePath();
         }
     }
 

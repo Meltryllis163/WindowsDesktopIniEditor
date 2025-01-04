@@ -155,7 +155,7 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         }
         updateValidateResultTip();
         // updateFileChooserCurrentDirectory();
-        log.info("Validated Path: {}. Time Spent: {}", path, System.currentTimeMillis() - start);
+        log.info("Time Spent: {}. Validated Path: {}.", path, System.currentTimeMillis() - start);
     }
 
     private void updateFileChooserCurrentDirectory() {

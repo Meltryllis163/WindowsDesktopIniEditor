@@ -1,7 +1,10 @@
 package cc.meltryllis.ui;
 
 import cc.meltryllis.constants.I18nConstants;
-import cc.meltryllis.ui.basic.*;
+import cc.meltryllis.ui.basic.IconFileFilter;
+import cc.meltryllis.ui.basic.LocaleFieldFileChooser;
+import cc.meltryllis.ui.basic.LocaleFileChooser;
+import cc.meltryllis.ui.basic.LocaleLabel;
 import cc.meltryllis.ui.event.LocaleListener;
 import com.formdev.flatlaf.util.StringUtils;
 import net.miginfocom.layout.CC;
@@ -44,7 +47,6 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
         LocaleFileChooser iconChooser = LocaleFileChooser.Builder.builder()
                 .fileSelectionMode(JFileChooser.FILES_ONLY)
                 .addChoosableFileFilter(new IconFileFilter())
-                .addChoosableFileFilter(new FolderFileFilter())
                 .build();
         fieldIconFile = new LocaleFieldFileChooser(iconChooser, "ui.fileChooser.icon.tip");
         fieldIconFile.addDocumentListener(this);

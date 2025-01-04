@@ -1,5 +1,6 @@
 package cc.meltryllis.ui;
 
+import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.constants.UIConstants;
 import cc.meltryllis.ui.basic.DialogBuilder;
 import cc.meltryllis.ui.event.CustomEventManager;
@@ -13,6 +14,7 @@ import org.ini4j.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 /**
  * @author Zachary W
@@ -96,7 +98,9 @@ public class MainApplication extends JFrame {
             }
             if (magicCount == 4) {
                 DialogBuilder.JDialogBuilder.builder().owner(this).modal(true)
-                        .titleI18nKey("ui.dialog.meltryllis.title").contentPane(new MeltryllisPanel()).resizable(false)
+                        .title(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
+                                .getString("ui.dialog.meltryllis.title")).contentPane(new MeltryllisPanel())
+                        .resizable(false)
                         .show();
                 magicCount = 0;
                 return true;

@@ -1,6 +1,8 @@
 package cc.meltryllis.utils;
 
 import cc.meltryllis.constants.DesktopIniConstants;
+import cc.meltryllis.constants.I18nConstants;
+import cc.meltryllis.ui.basic.DialogBuilder;
 import com.formdev.flatlaf.util.StringUtils;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,6 +14,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
+import java.util.ResourceBundle;
 
 /**
  * Desktop.ini文件全流程处理器。
@@ -76,18 +79,30 @@ public class DesktopIniProcessor {
     }
 
     public boolean createDesktopIniFile(Ini ini) {
-        if (desktopIniFile.exists()) {
-            desktopIniFile.delete();
+        try {
+            setDosAttribute(desktopIniFile.getPath(), false, false);
+            Files.deleteIfExists(desktopIniFile.toPath());
+        } catch (IOException e) {
+            log.info("Delete Failed.", e);
+            DialogBuilder.MessageDialogBuilder.builder(e.getMessage())
+                    .title(ResourceBundle.getBundle(I18nConstants.BASE_NAME).getString("ui.dialog.generate.fail.title"))
+                    .show();
+            return false;
         }
         try {
             if (!desktopIniFile.createNewFile()) {
                 return false;
             }
-            OutputStreamWriter oStreamWriter = new OutputStreamWriter(new FileOutputStream(desktopIniFile), StandardCharsets.UTF_16LE);
+            FileOutputStream fileOutputStream = new FileOutputStream(desktopIniFile);
+            OutputStreamWriter oStreamWriter = new OutputStreamWriter(fileOutputStream, StandardCharsets.UTF_16LE);
             oStreamWriter.write(DesktopIniConstants.UTF_16_LE_BOM);
             ini.store(oStreamWriter);
             setDosAttribute(folder.getPath(), true, null);
             setDosAttribute(desktopIniFile.getPath(), true, true);
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            oStreamWriter.flush();
+            oStreamWriter.close();
         } catch (IOException e) {
             return false;
         }

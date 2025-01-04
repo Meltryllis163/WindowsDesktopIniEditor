@@ -1,11 +1,9 @@
 package cc.meltryllis.ui.basic;
 
-import cc.meltryllis.constants.I18nConstants;
 import lombok.NonNull;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
 
 /**
  * 提供Builder模式给各种弹出面板。
@@ -28,15 +26,14 @@ public final class DialogBuilder {
         private int messageType;
         private Icon icon;
 
-        private MessageDialogBuilder(@NonNull String messageI18nKey) {
-            ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-            this.message = bundle.getObject(messageI18nKey);
+        private MessageDialogBuilder(@NonNull String message) {
+            this.message = message;
             this.title = UIManager.getString("OptionPane.messageDialogTitle");
             this.messageType = JOptionPane.INFORMATION_MESSAGE;
         }
 
-        public MessageDialogBuilder builder(@NonNull String messageI18nKey) {
-            return new MessageDialogBuilder(messageI18nKey);
+        public static MessageDialogBuilder builder(@NonNull String message) {
+            return new MessageDialogBuilder(message);
         }
 
         public MessageDialogBuilder parentComponent(Component c) {
@@ -44,9 +41,8 @@ public final class DialogBuilder {
             return this;
         }
 
-        public MessageDialogBuilder titleI18nKey(String titleI18nKey) {
-            ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-            this.title = bundle.getString(titleI18nKey);
+        public MessageDialogBuilder title(String title) {
+            this.title = title;
             return this;
         }
 
@@ -154,8 +150,8 @@ public final class DialogBuilder {
             return this;
         }
 
-        public JDialogBuilder titleI18nKey(String titleI18nKey) {
-            this.title = ResourceBundle.getBundle(I18nConstants.BASE_NAME).getString(titleI18nKey);
+        public JDialogBuilder title(String title) {
+            this.title = title;
             return this;
         }
 

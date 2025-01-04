@@ -3,7 +3,10 @@ package cc.meltryllis.ui;
 import cc.meltryllis.constants.DesktopIniConstants;
 import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.entity.DesktopIniEntity;
-import cc.meltryllis.ui.basic.*;
+import cc.meltryllis.ui.basic.FolderFileFilter;
+import cc.meltryllis.ui.basic.LocaleFieldFileChooser;
+import cc.meltryllis.ui.basic.LocaleFileChooser;
+import cc.meltryllis.ui.basic.LocaleLabel;
 import cc.meltryllis.ui.event.CustomEventManager;
 import cc.meltryllis.ui.event.FolderChangeListener;
 import cc.meltryllis.ui.event.LocaleListener;
@@ -75,14 +78,12 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         chooserFolderPath.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                log.info("Folder text changed. Fire FolderChanged event.");
                 CustomEventManager.getInstance()
                         .fireFolderChanged();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                log.info("Folder text changed. Fire FolderChanged event.");
                 CustomEventManager.getInstance()
                         .fireFolderChanged();
             }
@@ -157,63 +158,34 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         } catch (NoSuchFileException e) {
             return;
         }
-        log.info("Start loading desktop.ini content, current path : {}", chooserFolderPath.getText());
+        log.info("Start loading desktop.ini content. Current Path: {}", chooserFolderPath.getText());
         Ini desktopIni = processor.getDesktopIni();
         Profile.Section section =
                 desktopIni == null ? null : desktopIni.get(DesktopIniConstants.SECTION_SHELL_CLASS_INFO);
         if (section != null) {
-            if (containDllSource(desktopIni)) {
-                ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-                Object[] options = new Object[]{bundle.getString("ui.dialog.dllWarning.options.continue"), bundle.getString("ui.dialog.dllWarning.options.cancel")};
-                int res = DialogBuilder.OptionDialogBuilder.builder(bundle.getString("ui.dialog.dllWarning.message"))
-                        .parent(this)
-                        .title(bundle.getString("ui.dialog.dllWarning.title"))
-                        .optionType(JOptionPane.YES_NO_OPTION)
-                        .messageType(JOptionPane.WARNING_MESSAGE)
-                        .options(options)
-                        .initialValue(JOptionPane.NO_OPTION)
-                        .show();
-                log.info("DLL file detected. User choose {}.", res == JOptionPane.YES_OPTION ? "continue" : "cancel");
-                if (res != JOptionPane.YES_OPTION) {
-                    // TODO 这个地方会出现set以后立刻清除的一个闪烁
-                    SwingUtilities.invokeLater(() -> chooserFolderPath.setText(null));
-                    return;
-                }
-            }
             fieldInfoTip.setText(section.get(DesktopIniConstants.KEY_INFO_TIP));
             fieldLocalizedResourceName.setText(section.get(DesktopIniConstants.KEY_LOCALIZED_RESOURCE_NAME));
-            String iconResource = section.get(DesktopIniConstants.KEY_ICON_RESOURCE);
-            if (!StringUtils.isEmpty(iconResource)) {
-                int index = iconResource.lastIndexOf(',');
-                if (index > 0) {
-                    chooserIconResource.setIconPath(iconResource.substring(0, index));
-                    chooserIconResource.setIconIndex(iconResource.substring(index + 1)
-                            .trim());
-                }
-            }
+            loadIconResource(section.get(DesktopIniConstants.KEY_ICON_RESOURCE));
             chooserIconFile.setIconPath(section.get(DesktopIniConstants.KEY_ICON_FILE));
             chooserIconFile.setIconIndex(section.get(DesktopIniConstants.KEY_ICON_INDEX));
         } else {
-            log.info("No desktop.ini exist. Clear all text.");
+            log.info("Desktop.ini not exist. Clear all text.");
             fieldInfoTip.setText(null);
             fieldLocalizedResourceName.setText(null);
-            chooserIconResource.clearValues();
+            chooserIconResource.clearText();
+            chooserIconFile.clearText();
         }
     }
 
-    private boolean containDllSource(Ini ini) {
-        Profile.Section section = ini.get(DesktopIniConstants.SECTION_SHELL_CLASS_INFO);
-        if (section == null) {
-            return false;
+    private void loadIconResource(String iconResource) {
+        if (!StringUtils.isEmpty(iconResource)) {
+            int index = iconResource.lastIndexOf(',');
+            if (index > 0) {
+                chooserIconResource.setIconPath(iconResource.substring(0, index));
+                chooserIconResource.setIconIndex(iconResource.substring(index + 1)
+                        .trim());
+            }
         }
-        return containDllSource(section.get(DesktopIniConstants.KEY_LOCALIZED_RESOURCE_NAME))
-                || containDllSource(section.get(DesktopIniConstants.KEY_INFO_TIP))
-                || containDllSource(section.get(DesktopIniConstants.KEY_ICON_FILE));
-    }
-
-    private boolean containDllSource(String path) {
-        return !StringUtils.isEmpty(path) && path.startsWith("@") && path.toUpperCase()
-                .contains(".DLL");
     }
 
     private DesktopIniEntity generateDesktopIniEntity() {
@@ -238,7 +210,8 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
 
     @Override
     public void folderChanged() {
-        log.info("Folder changed. Current folder is {}", chooserFolderPath.getText());
+        // TODO 读取到系统路径后不允许编辑
+        log.info("Folder changed. Current folder is {}.", chooserFolderPath.getText());
         loadDesktopIniContent();
     }
 

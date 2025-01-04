@@ -85,7 +85,7 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
         return fieldIconFile.getValidateResult();
     }
 
-    public void clearValues() {
+    public void clearText() {
         setIconPath(null);
         setIconIndex(DEFAULT_INDEX);
     }

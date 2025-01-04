@@ -33,11 +33,11 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
     public static final int VALID = 2;
 
     private final Timer validatePathTimer;
-    private JTextField fileField;
-    private JButton browseButton;
+    private JTextField fieldFile;
+    private JButton buttonBrowse;
     private final LocaleFileChooser fileChooser;
     private final String fileRuleI18nKey;
-    private LocaleLabel validateResultTip;
+    private LocaleLabel labelValidateResultTip;
     @Getter
     private int validateResult;
 
@@ -49,7 +49,9 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         MigLayout layout = new MigLayout("ins 0, left top");
         this.fileChooser = fileChooser;
         setLayout(layout);
-        validatePathTimer = new Timer(timerDelay, e -> validatePath());
+        validatePathTimer = new Timer(timerDelay, e -> {
+            validatePath();
+        });
         validatePathTimer.setRepeats(false);
         this.fileRuleI18nKey = fileRuleI18nKey;
         initComponents();
@@ -72,20 +74,22 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
     public void initComponents() {
         int row = 0, column = 0;
         initFileField();
-        add(fileField, new CC().cell(column, row).pushX().growX());
+        add(fieldFile, new CC().cell(column, row)
+                .pushX()
+                .growX());
 
         column++;
         initBrowseButton();
-        add(browseButton, new CC().cell(column, row));
+        add(buttonBrowse, new CC().cell(column, row));
 
-        validateResultTip = new LocaleLabel(fileRuleI18nKey, new FlatSVGIcon("icons/error.svg"));
-        validateResultTip.putClientProperty(FlatClientProperties.STYLE, "foreground:$Message.color;font:$Message.font");
+        labelValidateResultTip = new LocaleLabel(fileRuleI18nKey, new FlatSVGIcon("icons/error.svg"));
+        labelValidateResultTip.putClientProperty(FlatClientProperties.STYLE, "foreground:$Message.color;font:$Message.font");
 
     }
 
     public void initFileField() {
-        fileField = new JTextField();
-        fileField.addFocusListener(new FocusListener() {
+        fieldFile = new JTextField();
+        fieldFile.addFocusListener(new FocusListener() {
             @Override
             public void focusGained(FocusEvent e) {
 
@@ -97,38 +101,46 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
                 validatePath();
             }
         });
-        fileField.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                log.info("Text changed. Timer restart.");
-                validatePathTimer.restart();
-            }
+        fieldFile.getDocument()
+                .addDocumentListener(new DocumentListener() {
+                    @Override
+                    public void insertUpdate(DocumentEvent e) {
+                        log.info("Insert Update. Timer restart. Current text is {}", fieldFile.getText());
+                        validatePathTimer.restart();
+                    }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                log.info("Text changed. Timer restart.");
-                validatePathTimer.restart();
-            }
+                    @Override
+                    public void removeUpdate(DocumentEvent e) {
+                        log.info("Remove Update. Timer restart. Current text is {}", fieldFile.getText());
+                        validatePathTimer.restart();
+                    }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-
-            }
-        });
+                    @Override
+                    public void changedUpdate(DocumentEvent e) {
+                        log.info("change update");
+                    }
+                });
     }
 
     public void initBrowseButton() {
         FlatSVGIcon browseIcon = new FlatSVGIcon("icons/browse.svg");
-        browseButton = new JButton(browseIcon);
+        buttonBrowse = new JButton(browseIcon);
         fileChooser.addActionListener(e -> {
             if (JFileChooser.APPROVE_SELECTION.equals(e.getActionCommand())) {
-                setText(fileChooser.getSelectedFile().getPath());
+                log.info("FileChooser completed. Current selected file is {}", fileChooser.getSelectedFile()
+                        .getPath());
+                setText(fileChooser.getSelectedFile()
+                        .getPath());
             }
         });
-        browseButton.addActionListener(e -> fileChooser.showOpenDialog(MainApplication.app));
+        buttonBrowse.addActionListener(e -> {
+            fileChooser.setCurrentDirectory(new File(parseEnvironmentVariables(getText())));
+            fileChooser.showOpenDialog(MainApplication.app);
+        });
     }
 
     private void validatePath() {
+        long start = System.currentTimeMillis();
         String path = getText();
         if (StringUtils.isEmpty(path)) {
             this.validateResult = EMPTY;
@@ -141,9 +153,9 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
                 this.validateResult = INVALID;
             }
         }
-        log.info("validatePath, result is {}", validateResult);
-        updateFileChooserCurrentDirectory();
         updateValidateResultTip();
+        // updateFileChooserCurrentDirectory();
+        log.info("Validated Path: {}. Time Spent: {}", path, System.currentTimeMillis() - start);
     }
 
     private void updateFileChooserCurrentDirectory() {
@@ -155,42 +167,42 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
     }
 
     public String getText() {
-        return fileField.getText();
+        return fieldFile.getText();
+    }
+
+    public void setText(String text) {
+        String oldText = fieldFile.getText();
+        log.info("setText(), oldText is {}, newTest is {}.", oldText, text);
+        if (StringUtils.isEmpty(oldText)) {
+            if (!StringUtils.isEmpty(text)) {
+                fieldFile.setText(text);
+            }
+        } else if (!oldText.equals(text)) {
+            fieldFile.setText(text);
+        }
     }
 
     private void updateValidateResultTip() {
-        boolean isTipExist = getComponentZOrder(validateResultTip) != -1;
+        boolean isTipExist = getComponentZOrder(labelValidateResultTip) != -1;
         if (validateResult == EMPTY) {
             if (isTipExist) {
-                remove(validateResultTip);
+                remove(labelValidateResultTip);
             }
         } else {
             if (!isTipExist) {
-                add(validateResultTip, new CC().cell(0, 1));
+                add(labelValidateResultTip, new CC().cell(0, 1));
             }
             boolean isValid = validateResult == VALID;
-            validateResultTip.setIcon(new FlatSVGIcon(isValid ? "icons/pass.svg" : "icons/error.svg"));
-            validateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.common.valid.tip" : fileRuleI18nKey);
+            labelValidateResultTip.setIcon(new FlatSVGIcon(isValid ? "icons/pass.svg" : "icons/error.svg"));
+            labelValidateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.common.valid.tip" : fileRuleI18nKey);
         }
         revalidate();
     }
 
-    public void setText(String text) {
-        String oldText = fileField.getText();
-        log.info("setText(), oldText is {}, newTest is {}.", oldText, text);
-        if (StringUtils.isEmpty(oldText)) {
-            if (!StringUtils.isEmpty(text)) {
-                fileField.setText(text);
-            }
-        } else if (!oldText.equals(text)) {
-            fileField.setText(text);
-        }
-    }
-
     @Override
     public void localeChanged(Locale locale) {
-        if (validateResultTip.isVisible()) {
-            validateResultTip.localeChanged(locale);
+        if (labelValidateResultTip.isVisible()) {
+            labelValidateResultTip.localeChanged(locale);
         }
         fileChooser.localeChanged(locale);
     }
@@ -208,7 +220,8 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         if (l == null) {
             return;
         }
-        fileField.getDocument().addDocumentListener(l);
+        fieldFile.getDocument()
+                .addDocumentListener(l);
     }
 
 }

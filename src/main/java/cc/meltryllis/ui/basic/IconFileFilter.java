@@ -14,10 +14,7 @@ public class IconFileFilter extends FileFilter {
 
     @Override
     public boolean accept(File f) {
-        if (f == null || !f.exists()) {
-            return false;
-        }
-        if (f.isFile()) {
+        if (f != null && f.exists() && f.isFile()) {
             String filePath = f.getPath();
             String extension = filePath.substring(filePath.lastIndexOf('.') + 1);
             return "exe".equalsIgnoreCase(extension)

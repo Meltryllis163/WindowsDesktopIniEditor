@@ -23,8 +23,12 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.nio.file.NoSuchFileException;
 import java.util.Locale;
+import java.util.Random;
 import java.util.ResourceBundle;
 
 /**
@@ -49,8 +53,7 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         MigLayout layout = new MigLayout("ins 20", "fill, grow");
         setLayout(layout);
         initComponents();
-        CustomEventManager.getInstance()
-                .addFolderChangeListener(this);
+        CustomEventManager.getInstance().addFolderChangeListener(this);
     }
 
     public void initComponents() {
@@ -70,28 +73,23 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelFolderPath, new CC().cell(column, row));
         row++;
         LocaleFileChooser folderChooser = LocaleFileChooser.Builder.builder()
-                .fileSelectionMode(JFileChooser.DIRECTORIES_ONLY)
-                .addChoosableFileFilter(new FolderFileFilter())
-                .approveButtonTextKey("ui.button.ok")
-                .build();
+                .fileSelectionMode(JFileChooser.DIRECTORIES_ONLY).addChoosableFileFilter(new FolderFileFilter())
+                .approveButtonTextKey("ui.button.ok").build();
         chooserFolderPath = new LocaleFieldFileChooser(folderChooser, "ui.fileChooser.folder.tip");
         chooserFolderPath.addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                CustomEventManager.getInstance()
-                        .fireFolderChanged();
+                CustomEventManager.getInstance().fireFolderChanged();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                CustomEventManager.getInstance()
-                        .fireFolderChanged();
+                CustomEventManager.getInstance().fireFolderChanged();
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                CustomEventManager.getInstance()
-                        .fireFolderChanged();
+                CustomEventManager.getInstance().fireFolderChanged();
             }
         });
         add(chooserFolderPath, new CC().cell(column, row));
@@ -101,6 +99,14 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelLocalizedResourceName, new CC().cell(column, row));
         row++;
         fieldLocalizedResourceName = new JTextField();
+        fieldLocalizedResourceName.getInputMap()
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "Random Text");
+        fieldLocalizedResourceName.getActionMap().put("Random Text", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fieldLocalizedResourceName.setText("随机别名" + new Random().nextInt(1000));
+            }
+        });
         add(fieldLocalizedResourceName, new CC().cell(column, row));
 
         row++;
@@ -108,6 +114,14 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(labelInfoTip, new CC().cell(column, row));
         row++;
         fieldInfoTip = new JTextField();
+        fieldInfoTip.getInputMap()
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK | InputEvent.ALT_DOWN_MASK), "Random Text");
+        fieldInfoTip.getActionMap().put("Random Text", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                fieldInfoTip.setText("随机备注" + new Random().nextInt(1000));
+            }
+        });
         add(fieldInfoTip, new CC().cell(column, row));
 
         row++;
@@ -125,8 +139,7 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
                 JOptionPane.showMessageDialog(EditorPanel.this, bundle.getString("ui.dialog.generate.success"));
             }
         });
-        add(buttonGenerate, new CC().cell(column, row)
-                .grow(0));
+        add(buttonGenerate, new CC().cell(column, row).grow(0));
     }
 
     public boolean generateDesktopIni() {
@@ -182,19 +195,16 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
             int index = iconResource.lastIndexOf(',');
             if (index > 0) {
                 chooserIconResource.setIconPath(iconResource.substring(0, index));
-                chooserIconResource.setIconIndex(iconResource.substring(index + 1)
-                        .trim());
+                chooserIconResource.setIconIndex(iconResource.substring(index + 1).trim());
             }
         }
     }
 
     private DesktopIniEntity generateDesktopIniEntity() {
-        return DesktopIniEntity.Builder.builder()
-                .localizedResourceName(fieldLocalizedResourceName.getText())
+        return DesktopIniEntity.Builder.builder().localizedResourceName(fieldLocalizedResourceName.getText())
                 .infoTip(fieldInfoTip.getText())
                 .iconResource(chooserIconResource.getIconPath(), chooserIconResource.getIconIndex())
-                .icon(chooserIconFile.getIconPath(), chooserIconFile.getIconIndex())
-                .build();
+                .icon(chooserIconFile.getIconPath(), chooserIconFile.getIconIndex()).build();
     }
 
     @Override

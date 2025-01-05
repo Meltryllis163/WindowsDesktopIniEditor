@@ -43,3 +43,4 @@ META-INF/
 /src/test/java/*.java
 /Windows Desktop.ini Editor Logs/
 out/
+/dependency-reduced-pom.xml

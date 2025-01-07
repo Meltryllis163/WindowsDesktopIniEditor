@@ -1,11 +1,15 @@
-package cc.meltryllis.ui.components;
+package cc.meltryllis.ui.basic;
 
 import cc.meltryllis.constants.I18nConstants;
-import lombok.Getter;
+import cc.meltryllis.ui.event.LocaleListener;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import java.util.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 /**
  * 具有实时语言切换功能的 {@link JFileChooser}。
@@ -17,19 +21,15 @@ public class LocaleFileChooser extends JFileChooser implements LocaleListener {
 
     private final String approveButtonTextKey;
 
-    @Getter
-    private final FileCheckerManager fileCheckerManager;
-
     private LocaleFileChooser(Builder builder) {
         ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
         setFileSelectionMode(builder.fileSelectionMode);
         setAcceptAllFileFilterUsed(builder.useAcceptAllFileFilter);
         approveButtonTextKey = builder.approveButtonTextKey;
         setApproveButtonText(bundle.getString(approveButtonTextKey));
-        for (FileChecker fileChecker : builder.fileCheckers) {
-            addChoosableFileFilter(fileChecker);
+        for (FileFilter fileFilter : builder.fileFilters) {
+            addChoosableFileFilter(fileFilter);
         }
-        fileCheckerManager = new FileCheckerManager(builder.fileCheckers);
     }
 
     @Override
@@ -46,13 +46,13 @@ public class LocaleFileChooser extends JFileChooser implements LocaleListener {
         private int fileSelectionMode;
         private boolean useAcceptAllFileFilter;
         private String approveButtonTextKey;
-        private final List<FileChecker> fileCheckers;
+        private final List<FileFilter> fileFilters;
 
         private Builder() {
             fileSelectionMode = JFileChooser.FILES_AND_DIRECTORIES;
             useAcceptAllFileFilter = false;
             approveButtonTextKey = "ui.button.ok";
-            fileCheckers = new ArrayList<>();
+            fileFilters = new ArrayList<>();
         }
 
         public static Builder builder() {
@@ -74,15 +74,19 @@ public class LocaleFileChooser extends JFileChooser implements LocaleListener {
             return this;
         }
 
-        public Builder addFileChecker(FileChecker fileChcker) {
-            fileCheckers.add(fileChcker);
+        public Builder addChoosableFileFilter(FileFilter fileFilter) {
+            fileFilters.add(fileFilter);
+            return this;
+        }
+
+        public Builder addChoosableFileFilter(String description, String... extensions) {
+            fileFilters.add(new FileNameExtensionFilter(description, extensions));
             return this;
         }
 
         public LocaleFileChooser build() {
             return new LocaleFileChooser(this);
         }
-
 
     }
 

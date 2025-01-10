@@ -36,7 +36,7 @@
                     <icon>${project.basedir}\src\main\resources\icons\icon.ico</icon>
                     <type>app-image</type>
                     <appVersion>1.0.0</appVersion>
-                    <description>A java program for editing Windows desktop.ini file.</description>
+                    <description>Java program for editing desktop.ini.</description>
                 </configuration>
             </plugin>
         </plugins>

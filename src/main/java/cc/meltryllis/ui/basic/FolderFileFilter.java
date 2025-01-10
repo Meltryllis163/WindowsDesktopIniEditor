@@ -1,10 +1,10 @@
 package cc.meltryllis.ui.basic;
 
-import cc.meltryllis.constants.I18nConstants;
+import cc.meltryllis.utils.I18nUtil;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.File;
-import java.util.ResourceBundle;
+
 
 /**
  * 过滤文件夹。
@@ -21,8 +21,8 @@ public class FolderFileFilter extends FileFilter {
 
     @Override
     public String getDescription() {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-        return bundle.getString("ui.label.folder");
+
+        return I18nUtil.getString("ui.label.folder");
     }
 
 }

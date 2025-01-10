@@ -1,9 +1,9 @@
 package cc.meltryllis.ui;
 
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.constants.UIConstants;
 import cc.meltryllis.ui.basic.DialogBuilder;
 import cc.meltryllis.ui.event.CustomEventManager;
+import cc.meltryllis.utils.I18nUtil;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.extras.FlatInspector;
 import com.formdev.flatlaf.extras.FlatSVGUtils;
@@ -14,9 +14,10 @@ import org.ini4j.Config;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
-import java.util.ResourceBundle;
 
 /**
+ * 程序主入口。
+ *
  * @author Zachary W
  * @date 2024/12/21
  */
@@ -25,22 +26,16 @@ public class MainApplication extends JFrame {
 
     public static MainApplication app;
 
-    public void initApplication() {
-        setIconImages(FlatSVGUtils.createWindowIconImages("/icons/main.svg"));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        registerGlobalHotKey();
-
-        initSize();
-        initMenuBar();
-        initEditorPanel();
-
-        pack();
-        setLocationRelativeTo(null);
-        setVisible(true);
+    public static void main(String[] args) {
+        FlatLightLaf.registerCustomDefaultsSource("themes");
+        FlatLightLaf.setup();
+        FlatInspector.install("ctrl shift alt X");
+        FlatUIDefaultsInspector.install("ctrl shift alt Y");
+        MainApplication.app = new MainApplication();
+        MainApplication.app.initApplication();
     }
 
     public void initSize() {
-        Config.getGlobal().setEscape(false);
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
         setPreferredSize(new Dimension(screenSize.width / 2, screenSize.height / 2));
@@ -59,13 +54,20 @@ public class MainApplication extends JFrame {
         add(editorPanel, BorderLayout.CENTER);
     }
 
-    public static void main(String[] args) {
-        FlatLightLaf.registerCustomDefaultsSource("themes");
-        FlatLightLaf.setup();
-        FlatInspector.install("ctrl shift alt X");
-        FlatUIDefaultsInspector.install("ctrl shift alt Y");
-        app = new MainApplication();
-        app.initApplication();
+    public void initApplication() {
+        setIconImages(FlatSVGUtils.createWindowIconImages("/icons/main.svg"));
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        // 避免ini4j将字符转换为ASCII
+        Config.getGlobal().setEscape(false);
+        registerGlobalHotKey();
+
+        initSize();
+        initMenuBar();
+        initEditorPanel();
+
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
     private int magicCount = 0;
@@ -98,8 +100,7 @@ public class MainApplication extends JFrame {
             }
             if (magicCount == 4) {
                 DialogBuilder.JDialogBuilder.builder().owner(this).modal(true)
-                        .title(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
-                                .getString("ui.dialog.meltryllis.title")).contentPane(new MeltryllisPanel())
+                        .title(I18nUtil.getString("ui.dialog.meltryllis.title")).contentPane(new MeltryllisPanel())
                         .resizable(false)
                         .show();
                 magicCount = 0;

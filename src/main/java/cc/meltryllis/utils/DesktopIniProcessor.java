@@ -1,7 +1,6 @@
 package cc.meltryllis.utils;
 
 import cc.meltryllis.constants.DesktopIniConstants;
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.ui.basic.DialogBuilder;
 import com.formdev.flatlaf.util.StringUtils;
 import lombok.NoArgsConstructor;
@@ -14,7 +13,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.util.ResourceBundle;
+
 
 /**
  * Desktop.ini文件全流程处理器。
@@ -95,7 +94,7 @@ public class DesktopIniProcessor {
         } catch (IOException e) {
             log.info("Delete Failed.", e);
             DialogBuilder.MessageDialogBuilder.builder(e.getMessage())
-                    .title(ResourceBundle.getBundle(I18nConstants.BASE_NAME).getString("ui.dialog.generate.fail.title"))
+                    .title(I18nUtil.getString("ui.dialog.generate.fail.title"))
                     .show();
             return false;
         }

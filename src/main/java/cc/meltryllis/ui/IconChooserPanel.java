@@ -1,11 +1,11 @@
 package cc.meltryllis.ui;
 
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.ui.basic.IconFileFilter;
 import cc.meltryllis.ui.basic.LocaleFieldFileChooser;
 import cc.meltryllis.ui.basic.LocaleFileChooser;
 import cc.meltryllis.ui.basic.LocaleLabel;
 import cc.meltryllis.ui.event.LocaleListener;
+import cc.meltryllis.utils.I18nUtil;
 import com.formdev.flatlaf.util.StringUtils;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
@@ -15,7 +15,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 /**
  * 含有图标和图标索引输入框的面板。
@@ -54,8 +53,7 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
 
         fieldIconIndex = new JTextField(DEFAULT_INDEX);
         fieldIconIndex.setEnabled(false);
-        fieldIconIndex.setToolTipText(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
-                .getString("ui.field.iconIndex.tooltip"));
+        fieldIconIndex.setToolTipText(I18nUtil.getString("ui.field.iconIndex.tooltip"));
         add(fieldIconIndex, new CC().cell(column + 1, row));
     }
 
@@ -93,9 +91,7 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
         setIconIndex(DEFAULT_INDEX);
     }
 
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
+    private void updateIconIndexEnabled() {
         if (notDllFile()) {
             fieldIconIndex.setEnabled(false);
             fieldIconIndex.setText(DEFAULT_INDEX);
@@ -105,13 +101,13 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
     }
 
     @Override
+    public void insertUpdate(DocumentEvent e) {
+        updateIconIndexEnabled();
+    }
+
+    @Override
     public void removeUpdate(DocumentEvent e) {
-        if (notDllFile()) {
-            fieldIconIndex.setEnabled(false);
-            fieldIconIndex.setText(DEFAULT_INDEX);
-        } else {
-            fieldIconIndex.setEnabled(true);
-        }
+        updateIconIndexEnabled();
     }
 
     @Override
@@ -126,8 +122,7 @@ public class IconChooserPanel extends JPanel implements DocumentListener, Locale
                 ((LocaleListener) component).localeChanged(locale);
             }
         }
-        fieldIconIndex.setToolTipText(ResourceBundle.getBundle(I18nConstants.BASE_NAME)
-                .getString("ui.field.iconIndex.tooltip"));
+        fieldIconIndex.setToolTipText(I18nUtil.getString("ui.field.iconIndex.tooltip"));
     }
 
 }

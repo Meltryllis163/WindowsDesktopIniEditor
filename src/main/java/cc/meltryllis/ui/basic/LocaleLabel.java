@@ -1,11 +1,11 @@
 package cc.meltryllis.ui.basic;
 
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.ui.event.LocaleListener;
+import cc.meltryllis.utils.I18nUtil;
 
 import javax.swing.*;
 import java.util.Locale;
-import java.util.ResourceBundle;
+
 
 /**
  * 具有实时语言切换功能的 {@link JLabel}。
@@ -27,21 +27,21 @@ public class LocaleLabel extends JLabel implements LocaleListener {
 
     public LocaleLabel(String key, Icon icon, int horizontalAlignment) {
         this.localeTextKey = key;
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-        setText(bundle.getString(localeTextKey));
+
+        setText(I18nUtil.getString(localeTextKey));
         setIcon(icon);
         setHorizontalAlignment(horizontalAlignment);
     }
 
     public void setLocaleTextKey(String localeTextKey) {
         this.localeTextKey = localeTextKey;
-        setText(ResourceBundle.getBundle(I18nConstants.BASE_NAME).getString(localeTextKey));
+        setText(I18nUtil.getString(localeTextKey));
     }
 
     @Override
     public void localeChanged(Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
-        setText(bundle.getString(localeTextKey));
+
+        setText(I18nUtil.getString(localeTextKey));
     }
 
 }

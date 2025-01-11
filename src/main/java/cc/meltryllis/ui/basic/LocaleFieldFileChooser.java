@@ -80,20 +80,20 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
 
             @Override
             public void focusLost(FocusEvent e) {
-                log.info("Focus Lost. Run validatePath().");
+                log.debug("Focus Lost. Run validatePath().");
                 validatePath();
             }
         });
         fieldFile.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                log.info("Insert Update. Timer restart. Current text is {}", fieldFile.getText());
+                log.debug("Insert Update. Timer restart. Current path text is {}", fieldFile.getText());
                 validatePathTimer.restart();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                log.info("Remove Update. Timer restart. Current text is {}", fieldFile.getText());
+                log.debug("Remove Update. Timer restart. Current path text is {}", fieldFile.getText());
                 validatePathTimer.restart();
             }
 
@@ -114,10 +114,8 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
             }
         });
         buttonBrowse.addActionListener(e -> {
-            // TODO updateFileChooserCurrentDirectory或者说setCurrentDirectory
-            //  在碰到一个特殊的系统文件路径C:\Windows\System32\imageres.dll后
-            //  如果尝试再set为null，将会导致卡，暂时放弃该功能
-            // fileChooser.setCurrentDirectory(new File(parseEnvironmentVariables(getText())));
+            // TODO 该方法会造成程序卡顿，等待FlatLaf更新
+            // fileChooser.setCurrentDirectory(new File(DesktopIniProcessor.parseEnvironmentVariables(getText())));
             fileChooser.showOpenDialog(MainApplication.app);
         });
     }
@@ -126,28 +124,53 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         long start = System.currentTimeMillis();
         String path = getText();
         if (StringUtils.isEmpty(path)) {
-            this.validateResult = EMPTY;
+            validateResult = EMPTY;
         } else {
             File file = new File(DesktopIniProcessor.parseEnvironmentVariables(path));
-            boolean isPathValid = fileChooser.accept(file);
-            if (isPathValid) {
-                this.validateResult = VALID;
-            } else {
-                this.validateResult = INVALID;
-            }
+            validateResult = fileChooser.accept(file) ? VALID : INVALID;
         }
+        updateFieldOutlineColor();
         updateValidateResultTip();
-        // updateFileChooserCurrentDirectory();
-        log.info("Time Spent: {}. Validated Path: {}.", System.currentTimeMillis() - start, path);
+        updateFileChooserCurrentDirectory();
+        log.debug("Time Spent: {}ms. Path: {}.", System.currentTimeMillis() - start, path);
     }
 
-    // private void updateFileChooserCurrentDirectory() {
-    //     if (this.validateResult == EMPTY || this.validateResult == INVALID) {
-    //         fileChooser.setCurrentDirectory(null);
-    //     } else if (this.validateResult == VALID) {
-    //         fileChooser.setCurrentDirectory(new File(parseEnvironmentVariables(getText())));
-    //     }
-    // }
+    private void updateFieldOutlineColor() {
+        if (validateResult == EMPTY || validateResult == VALID) {
+            fieldFile.putClientProperty(FlatClientProperties.OUTLINE, null);
+        } else {
+            fieldFile.putClientProperty(FlatClientProperties.OUTLINE, FlatClientProperties.OUTLINE_ERROR);
+        }
+    }
+
+    private void updateValidateResultTip() {
+        updateValidateTipStyle();
+
+        boolean isTipExist = isTipExist();
+        if (validateResult == EMPTY && isTipExist) {
+            remove(labelValidateResultTip);
+            revalidate();
+        }
+        if (validateResult != EMPTY && !isTipExist) {
+            add(labelValidateResultTip, new CC().cell(0, 1));
+            revalidate();
+        }
+    }
+
+    private void updateValidateTipStyle() {
+        boolean isValid = validateResult == VALID;
+        labelValidateResultTip.setIcon(new FlatSVGIcon(isValid ? "icons/pass.svg" : "icons/error.svg"));
+        labelValidateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.common.valid.tip" : fileRuleI18nKey);
+    }
+
+    private void updateFileChooserCurrentDirectory() {
+        // TODO 该方法会造成程序卡顿，等待FlatLaf更新
+        // if (this.validateResult == EMPTY || this.validateResult == INVALID) {
+        //     fileChooser.setCurrentDirectory(null);
+        // } else if (this.validateResult == VALID) {
+        //     fileChooser.setCurrentDirectory(new File(DesktopIniProcessor.parseEnvironmentVariables(getText())));
+        // }
+    }
 
     public String getText() {
         return fieldFile.getText();
@@ -155,7 +178,7 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
 
     public void setText(String text) {
         String oldText = fieldFile.getText();
-        log.info("setText(), oldText is {}, newTest is {}.", oldText, text);
+        log.debug("Old Text: {}. New Text: {}.", oldText, text);
         if (StringUtils.isEmpty(oldText)) {
             if (!StringUtils.isEmpty(text)) {
                 fieldFile.setText(text);
@@ -165,28 +188,13 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         }
     }
 
-    private void updateValidateResultTip() {
-        boolean isTipExist = getComponentZOrder(labelValidateResultTip) != -1;
-        if (validateResult == EMPTY) {
-            if (isTipExist) {
-                remove(labelValidateResultTip);
-            }
-        } else {
-            if (!isTipExist) {
-                add(labelValidateResultTip, new CC().cell(0, 1));
-            }
-            boolean isValid = validateResult == VALID;
-            labelValidateResultTip.setIcon(new FlatSVGIcon(isValid ? "icons/pass.svg" : "icons/error.svg"));
-            labelValidateResultTip.setLocaleTextKey(isValid ? "ui.fileChooser.common.valid.tip" : fileRuleI18nKey);
-        }
-        revalidate();
+    private boolean isTipExist() {
+        return getComponentZOrder(labelValidateResultTip) != -1;
     }
 
     @Override
     public void localeChanged(Locale locale) {
-        if (labelValidateResultTip.isVisible()) {
-            labelValidateResultTip.localeChanged(locale);
-        }
+        labelValidateResultTip.localeChanged(locale);
         fileChooser.localeChanged(locale);
     }
 
@@ -196,6 +204,11 @@ public class LocaleFieldFileChooser extends JPanel implements LocaleListener {
         // fileChooser并没有被添加到面板中，因此更新主题时有部分UI未更新，需要手动更新
         if (fileChooser != null) {
             fileChooser.updateUI();
+        }
+        // Fix 修复以下情形中标签颜色错误的问题：
+        // 程序启动时标签颜色为明亮模式颜色。此时切换为暗黑模式，由于标签未被添加至组件中，因此updateUI不会更新标签颜色，因此需要手动更新。
+        if (labelValidateResultTip != null) {
+            labelValidateResultTip.updateUI();
         }
     }
 

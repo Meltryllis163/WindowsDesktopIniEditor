@@ -1,7 +1,7 @@
 package cc.meltryllis.ui.basic;
 
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.ui.event.LocaleListener;
+import cc.meltryllis.utils.I18nUtil;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -9,7 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
+
 
 /**
  * 具有实时语言切换功能的 {@link JFileChooser}。
@@ -22,11 +22,11 @@ public class LocaleFileChooser extends JFileChooser implements LocaleListener {
     private final String approveButtonTextKey;
 
     private LocaleFileChooser(Builder builder) {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+
         setFileSelectionMode(builder.fileSelectionMode);
         setAcceptAllFileFilterUsed(builder.useAcceptAllFileFilter);
         approveButtonTextKey = builder.approveButtonTextKey;
-        setApproveButtonText(bundle.getString(approveButtonTextKey));
+        setApproveButtonText(I18nUtil.getString(approveButtonTextKey));
         for (FileFilter fileFilter : builder.fileFilters) {
             addChoosableFileFilter(fileFilter);
         }
@@ -34,11 +34,11 @@ public class LocaleFileChooser extends JFileChooser implements LocaleListener {
 
     @Override
     public void localeChanged(Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+
         // JFileChooser的国际化，必须更新UI。由于UI的语言区域使用的是JFileChooser.getLocale()，而不是Locale.getDefault()，因此需要先setLocale更新。
         setLocale(locale);
         updateUI();
-        setApproveButtonText(bundle.getString(approveButtonTextKey));
+        setApproveButtonText(I18nUtil.getString(approveButtonTextKey));
     }
 
     public static class Builder {

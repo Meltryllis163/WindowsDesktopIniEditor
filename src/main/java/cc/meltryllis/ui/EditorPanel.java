@@ -1,7 +1,6 @@
 package cc.meltryllis.ui;
 
 import cc.meltryllis.constants.DesktopIniConstants;
-import cc.meltryllis.constants.I18nConstants;
 import cc.meltryllis.entity.DesktopIniEntity;
 import cc.meltryllis.ui.basic.FolderFileFilter;
 import cc.meltryllis.ui.basic.LocaleFieldFileChooser;
@@ -11,6 +10,7 @@ import cc.meltryllis.ui.event.CustomEventManager;
 import cc.meltryllis.ui.event.FolderChangeListener;
 import cc.meltryllis.ui.event.LocaleListener;
 import cc.meltryllis.utils.DesktopIniProcessor;
+import cc.meltryllis.utils.I18nUtil;
 import com.formdev.flatlaf.FlatClientProperties;
 import com.formdev.flatlaf.util.StringUtils;
 import lombok.extern.log4j.Log4j2;
@@ -29,7 +29,6 @@ import java.awt.event.KeyEvent;
 import java.nio.file.NoSuchFileException;
 import java.util.Locale;
 import java.util.Random;
-import java.util.ResourceBundle;
 
 /**
  * desktop.ini 编辑器主面板。
@@ -57,8 +56,6 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
     }
 
     public void initComponents() {
-
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
 
         int row = 0, column = 0;
         LocaleLabel titleLabel = new LocaleLabel("ui.title");
@@ -133,27 +130,27 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
         add(chooserIconFile, new CC().cell(column, row));
 
         row++;
-        buttonGenerate = new JButton(bundle.getString("ui.button.generate"));
+        buttonGenerate = new JButton(I18nUtil.getString("ui.button.generate"));
         buttonGenerate.addActionListener(e -> {
             if (generateDesktopIni()) {
-                JOptionPane.showMessageDialog(EditorPanel.this, bundle.getString("ui.dialog.generate.success"));
+                JOptionPane.showMessageDialog(EditorPanel.this, I18nUtil.getString("ui.dialog.generate.success"));
             }
         });
         add(buttonGenerate, new CC().cell(column, row).grow(0));
     }
 
     public boolean generateDesktopIni() {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+
         if (chooserFolderPath.getValidateResult() == LocaleFieldFileChooser.INVALID) {
-            JOptionPane.showMessageDialog(MainApplication.app, bundle.getString("ui.dialog.folder.invalid"));
+            JOptionPane.showMessageDialog(MainApplication.app, I18nUtil.getString("ui.dialog.folder.invalid"));
             return false;
         }
         if (chooserIconResource.getValidateResult() == LocaleFieldFileChooser.INVALID) {
-            JOptionPane.showMessageDialog(MainApplication.app, bundle.getString("ui.dialog.iconResource.invalid"));
+            JOptionPane.showMessageDialog(MainApplication.app, I18nUtil.getString("ui.dialog.iconResource.invalid"));
             return false;
         }
         if (chooserIconFile.getValidateResult() == LocaleFieldFileChooser.INVALID) {
-            JOptionPane.showMessageDialog(MainApplication.app, bundle.getString("ui.dialog.iconFile.invalid"));
+            JOptionPane.showMessageDialog(MainApplication.app, I18nUtil.getString("ui.dialog.iconFile.invalid"));
             return false;
         }
         try {
@@ -213,13 +210,13 @@ public class EditorPanel extends JPanel implements LocaleListener, FolderChangeL
 
     @Override
     public void localeChanged(Locale locale) {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+
         for (Component component : getComponents()) {
             if (component instanceof LocaleListener) {
                 ((LocaleListener) component).localeChanged(locale);
             }
         }
-        buttonGenerate.setText(bundle.getString("ui.button.generate"));
+        buttonGenerate.setText(I18nUtil.getString("ui.button.generate"));
     }
 
     @Override

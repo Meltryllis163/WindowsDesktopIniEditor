@@ -1,12 +1,12 @@
 package cc.meltryllis.ui;
 
-import cc.meltryllis.constants.I18nConstants;
+import cc.meltryllis.utils.I18nUtil;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ResourceBundle;
+
 
 /**
  * 一个神秘的面板。
@@ -23,7 +23,7 @@ public class MeltryllisPanel extends JPanel {
     }
 
     public void initComponents() {
-        ResourceBundle bundle = ResourceBundle.getBundle(I18nConstants.BASE_NAME);
+
         ImageIcon icon = new ImageIcon("src/main/resources/pic/114153183_p0.jpg");
         int width = 150;
         int height = width * icon.getIconHeight() / icon.getIconWidth();
@@ -31,11 +31,11 @@ public class MeltryllisPanel extends JPanel {
         JLabel labelPic = new JLabel(icon);
         add(labelPic, new CC().cell(0, 0).spanY(2));
 
-        JTextArea textArea = new JTextArea(bundle.getString("ui.dialog.meltryllis.message"));
+        JTextArea textArea = new JTextArea(I18nUtil.getString("ui.dialog.meltryllis.message"));
         textArea.setEnabled(false);
         add(textArea, new CC().cell(1, 0).alignY("top"));
 
-        JTextArea textAreaArt = new JTextArea(bundle.getString("ui.dialog.meltryllis.artInfo"));
+        JTextArea textAreaArt = new JTextArea(I18nUtil.getString("ui.dialog.meltryllis.artInfo"));
         textAreaArt.setEnabled(false);
         add(textAreaArt, new CC().cell(1, 1).alignY("bottom"));
     }
